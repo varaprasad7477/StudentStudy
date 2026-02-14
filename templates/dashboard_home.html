@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - AI Study Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .header-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-bar h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .header-bar .user-info {
+            text-align: right;
+        }
+
+        .header-bar .username {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .header-bar .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .header-bar .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons a {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .action-buttons a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .subjects-section {
+            margin-bottom: 2rem;
+        }
+
+        .subjects-section h2 {
+            color: #333;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .subject-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .subject-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+            transform: translateY(-4px);
+        }
+
+        .subject-card h3 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 1.3rem;
+        }
+
+        .subject-card .student-name {
+            color: #999;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .subject-details {
+            margin: 1rem 0;
+        }
+
+        .subject-details p {
+            margin: 0.5rem 0;
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .subject-details .label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .subject-details .value {
+            color: #667eea;
+        }
+
+        .priority-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+
+        .priority-badge.high {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .priority-badge.medium {
+            background: #fcd34d;
+            color: #78350f;
+        }
+
+        .priority-badge.low {
+            background: #bbf7d0;
+            color: #065f46;
+        }
+
+        .days-left {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.5rem 0.8rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0.5rem 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .card-actions a,
+        .card-actions button {
+            flex: 1;
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-view {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #764ba2;
+        }
+
+        .btn-delete {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .btn-delete:hover {
+            background: #fca5a5;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .empty-state h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn-confirm {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .header-bar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .subjects-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons a {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="header-bar">
+        <div>
+            <h1>📚 My Dashboard</h1>
+        </div>
+        <div class="user-info">
+            <div class="username">👤 {{ user.username }}</div>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{{ url_for('upload') }}">➕ Add New Subject</a>
+        <a href="{{ url_for('calendar') }}">📅 View Exam Calendar</a>
+        <a href="{{ url_for('test_plan') }}">🧪 View Sample Plan</a>
+    </div>
+
+    <!-- Subjects Section -->
+    <div class="subjects-section">
+        <h2>📖 Your Subjects</h2>
+        
+        {% if subjects and subjects|length > 0 %}
+            <div class="subjects-grid">
+                {% for subject in subjects %}
+                    {% set days_remaining = (subject.exam_date | string | urlencode) %}
+                    <div class="subject-card">
+                        <h3>{{ subject.subject_name }}</h3>
+                        <p class="student-name">📝 {{ subject.student_name }} ({{ subject.roll_number }})</p>
+                        
+                        <div class="subject-details">
+                            <p><span class="label">📅 Exam Date:</span> <span class="value">{{ subject.exam_date }}</span></p>
+                            
+                            <div id="days-{{ subject.id }}" class="days-left">
+                                Calculating...
+                            </div>
+                            
+                            <span class="priority-badge {{ subject.priority | lower }}">
+                                {% if subject.priority == "High" %}
+                                    🔴 {{ subject.priority }}
+                                {% elif subject.priority == "Medium" %}
+                                    🟡 {{ subject.priority }}
+                                {% else %}
+                                    🟢 {{ subject.priority }}
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        <div class="card-actions">
+                            <a href="{{ url_for('view_subject', subject_id=subject.id) }}" class="btn-view">
+                                👁️ View Plan
+                            </a>
+                            <button class="btn-delete" onclick="confirmDelete({{ subject.id }}, '{{ subject.subject_name }}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No subjects yet</h3>
+                <p>Click "Add New Subject" to get started with your first study plan!</p>
+                <a href="{{ url_for('upload') }}" class="btn-primary" style="color: #667eea; text-decoration: none; font-weight: 600;">Start Now →</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <h3>Delete Subject?</h3>
+        <p id="deleteMessage">Are you sure you want to delete this subject? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button class="btn-confirm" onclick="deleteSubject()">Delete</button>
+            <button class="btn-cancel" onclick="cancelDelete()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let deleteSubjectId = null;
+
+    function calculateDaysRemaining(examDate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const exam = new Date(examDate);
+        exam.setHours(0, 0, 0, 0);
+        
+        const timeDiff = exam - today;
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        return daysRemaining;
+    }
+
+    function getStatusText(days) {
+        if (days < 0) return '⚠️ Exam passed';
+        if (days === 0) return '🔴 Exam Today!';
+        if (days === 1) return '🔴 Exam Tomorrow!';
+        if (days < 7) return `🔴 ${days} days left`;
+        if (days < 14) return `🟡 ${days} days left`;
+        return `🟢 ${days} days left`;
+    }
+
+    // Update days remaining for all subjects
+    document.querySelectorAll('[id^="days-"]').forEach(element => {
+        const subjectId = element.id.split('-')[1];
+        const examDateElement = document.querySelector(`[data-exam-date-${subjectId}]`);
+        
+        // Find the exam date from the card
+        const card = element.closest('.subject-card');
+        const examDateText = card.querySelector('.subject-details .value')?.textContent;
+        
+        if (examDateText) {
+            const days = calculateDaysRemaining(examDateText);
+            element.textContent = getStatusText(days);
+        }
+    });
+
+    function confirmDelete(subjectId, subjectName) {
+        deleteSubjectId = subjectId;
+        document.getElementById('deleteMessage').textContent = 
+            `Are you sure you want to delete "${subjectName}"? This action cannot be undone.`;
+        document.getElementById('deleteModal').classList.add('show');
+    }
+
+    function cancelDelete() {
+        deleteSubjectId = null;
+        document.getElementById('deleteModal').classList.remove('show');
+    }
+
+    async function deleteSubject() {
+        if (!deleteSubjectId) return;
+        
+        try {
+            const response = await fetch(`/subject/${deleteSubjectId}/delete`, {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                // Reload page to show updated subjects
+                window.location.reload();
+            } else {
+                const data = await response.json();
+                alert('Error: ' + (data.error || 'Failed to delete'));
+            }
+        } catch (error) {
+            alert('An error occurred while deleting the subject.');
+        }
+        
+        cancelDelete();
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('deleteModal');
+        if (event.target === modal) {
+            cancelDelete();
+        }
+    }
+</script>
+
+</body>
+</html>

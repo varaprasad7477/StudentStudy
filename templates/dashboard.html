@@ -2,95 +2,483 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard | StudentStudy</title>
+    <title>Study Dashboard - AI Study Planner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        /* Navigation Bar Styles */
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .navbar-menu a:hover {
+            opacity: 0.8;
+        }
+
+        .navbar-user {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .navbar-user .username {
+            font-weight: 600;
+        }
+
+        .navbar-user .logout-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .navbar-user .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar-menu {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Study Plan Specific Styles */
+        .study-plan-container {
+            background: #fff;
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .plan-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .summary-item {
+            background: rgba(255,255,255,0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-item .label {
+            display: block;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-item .value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .recommendation {
+            margin: 1rem 0 0 0;
+            font-size: 1rem;
+        }
+
+        .syllabus-structure {
+            margin-bottom: 2rem;
+        }
+
+        .syllabus-structure h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .chapters-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .chapter-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 350px;
+            overflow: hidden;
+        }
+
+        .chapter-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .chapter-header {
+            display: block;
+            margin-bottom: 1rem;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .chapter-header h4 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-top: 0.5rem;
+        }
+
+        .difficulty-easy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .difficulty-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .difficulty-hard {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .topic-count {
+            color: #666;
+            font-size: 0.95rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .topics-list ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .topics-list li {
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            color: #555;
+            font-size: 0.9rem;
+            position: relative;
+            line-height: 1.5;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .topics-list li:before {
+            content: "• ";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .weekly-plan {
+            margin-bottom: 2rem;
+        }
+
+        .weekly-plan h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .weeks-container {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .week-card {
+            background: #f9f9f9;
+            border-left: 5px solid #667eea;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .week-card h4 {
+            color: #333;
+            margin: 0 0 1.5rem 0;
+            font-size: 1.2rem;
+        }
+
+        .chapter-study-week {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .chapter-study-week h5 {
+            margin: 0 0 0.8rem 0;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .study-details {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .detail-item {
+            background: #e8eef7;
+            color: #667eea;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .topics-preview {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 1rem;
+        }
+
+        .topics-preview p {
+            margin: 0 0 0.5rem 0;
+            color: #666;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .topics-preview ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .topics-preview li {
+            padding: 0.4rem 0 0.4rem 1.5rem;
+            color: #666;
+            font-size: 0.85rem;
+            position: relative;
+            line-height: 1.3;
+        }
+
+        .topics-preview li:before {
+            content: "✓ ";
+            color: #28a745;
+            position: absolute;
+            left: 0;
+        }
+
+        .additional {
+            color: #999;
+            font-style: italic;
+        }
+
+        .final-revision-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+        }
+
+        .final-revision-card h4 {
+            margin: 0 0 1rem 0;
+            font-size: 1.2rem;
+        }
+
+        .revision-activities {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .revision-activities li {
+            padding: 0.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .study-tips-section {
+            margin-top: 2rem;
+        }
+
+        .study-tips-section h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tip-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .tip-card h5 {
+            color: #333;
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+        }
+
+        .tip-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .tip-card li {
+            padding: 0.4rem 0 0.4rem 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .tip-card li:before {
+            content: "→ ";
+            color: #667eea;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .study-plan-container {
+                padding: 1rem;
+            }
+
+            .chapters-container {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 
 <body>
 
+<!-- Navigation Bar -->
+<div class="navbar">
+    <a href="{{ url_for('dashboard_home') }}" class="navbar-brand">📚 AI Study Planner</a>
+    <div class="navbar-menu">
+        <a href="{{ url_for('dashboard_home') }}">Dashboard</a>
+        <a href="{{ url_for('upload') }}">Add Subject</a>
+        <a href="{{ url_for('calendar') }}">Calendar</a>
+    </div>
+    <div class="navbar-user">
+        <span class="username">👤 {{ current_user.username }}</span>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+</div>
+
 <div class="container">
 
     <!-- Header -->
-    <h1>Study Dashboard</h1>
+    <h1>📚 Study Plan Dashboard</h1>
     <p class="subtitle">
-        Your AI-generated smart study schedule is ready.
+        Your personalized AI-generated study plan is ready!
     </p>
 
     <!-- Student Information -->
     <div class="student-info">
-        <p><strong>Student:</strong> {{ student_name }}</p>
-        <p><strong>Subject:</strong> {{ subject_name }}</p>
+        <p><strong>👤 Student Name:</strong> {{ student_name }}</p>
+        <p><strong>📖 Subject:</strong> {{ subject_name }}</p>
+        <p><strong>📆 Exam Date:</strong> {{ exam_date }}</p>
     </div>
 
     <!-- AI Study Plan Section -->
     <div class="section">
-        <h2>AI Study Plan</h2>
-
-        <div class="plan-box">
-            {{ plan }}
-        </div>
-    </div>
-
-    <!-- Progress Tracking Section -->
-    <div class="section">
-        <h2>Track Your Progress</h2>
-
-        <div class="progress-container">
-            <label>
-                <input type="checkbox" class="task"> Completed Today's Schedule
-            </label><br>
-
-            <label>
-                <input type="checkbox" class="task"> Revised Important Topics
-            </label><br>
-
-            <label>
-                <input type="checkbox" class="task"> Practiced Mock Tests
-            </label>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-
-        <p id="progressText" style="margin-top:8px;">0% Completed</p>
+        {{ plan | safe }}
     </div>
 
     <!-- Navigation Buttons -->
     <div class="button-group">
-        <a href="/" class="btn-secondary">Add Another Subject</a>
-        <a href="/calendar" class="btn-secondary">View Calendar</a>
+        <a href="/" class="btn-secondary">➕ Add Another Subject</a>
+        <a href="/calendar" class="btn-secondary">📅 View Calendar</a>
     </div>
 
 </div>
-
-<!-- ================= PROGRESS SCRIPT ================= -->
-
-<script>
-    const checkboxes = document.querySelectorAll('.task');
-    const progressFill = document.getElementById('progressFill');
-    const progressText = document.getElementById('progressText');
-
-    function updateProgress() {
-        let checked = document.querySelectorAll('.task:checked').length;
-        let total = checkboxes.length;
-        let percent = Math.round((checked / total) * 100);
-
-        progressFill.style.width = percent + "%";
-        progressText.textContent = percent + "% Completed";
-    }
-
-    checkboxes.forEach(box => {
-        box.addEventListener('change', updateProgress);
-    });
-</script>
 
 </body>
 </html>

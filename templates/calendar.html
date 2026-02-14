@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Exam Calendar | StudentStudy</title>
+    <title>Exam Calendar | AI Study Planner</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- Google Font -->
@@ -10,69 +10,399 @@
 
     <!-- CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .calendar-container {
+            margin-top: 20px;
+        }
+
+        .exam-card {
+            background: white;
+            border-left: 5px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .exam-card:hover {
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .exam-card.high {
+            border-left-color: #dc2626;
+        }
+
+        .exam-card.medium {
+            border-left-color: #f59e0b;
+        }
+
+        .exam-card.low {
+            border-left-color: #16a34a;
+        }
+
+        .exam-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .exam-title {
+            flex: 1;
+        }
+
+        .exam-title h3 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+            font-size: 1.2rem;
+        }
+
+        .student-name {
+            color: #666;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .exam-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .detail-box {
+            background: #f9f9f9;
+            padding: 0.8rem;
+            border-radius: 6px;
+        }
+
+        .detail-label {
+            color: #999;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        .detail-value {
+            color: #333;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .days-remaining {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+
+        .days-remaining.urgent {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .days-remaining.normal {
+            background: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .days-remaining.plenty {
+            background: #bbf7d0;
+            color: #065f46;
+        }
+
+        .priority-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .priority-badge.High {
+            background: #dc2626;
+        }
+
+        .priority-badge.Medium {
+            background: #f59e0b;
+        }
+
+        .priority-badge.Low {
+            background: #16a34a;
+        }
+
+        .no-exams {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+        }
+
+        .table-view {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .exam-header {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .exam-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: white;
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .navbar-menu a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s ease;
+        }
+
+        .navbar-menu a:hover {
+            opacity: 0.8;
+        }
+
+        .navbar-user {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .navbar-user .username {
+            font-weight: 600;
+        }
+
+        .navbar-user .logout-btn {
+            background: rgba(255,255,255,0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .navbar-user .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .navbar-menu {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
+<!-- Navigation Bar -->
+<div class="navbar">
+    <a href="{{ url_for('dashboard_home') }}" class="navbar-brand">📚 AI Study Planner</a>
+    <div class="navbar-menu">
+        <a href="{{ url_for('dashboard_home') }}">Dashboard</a>
+        <a href="{{ url_for('upload') }}">Add Subject</a>
+        <a href="{{ url_for('calendar') }}">Calendar</a>
+    </div>
+    <div class="navbar-user">
+        <span class="username">👤 {{ current_user.username }}</span>
+        <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+    </div>
+</div>
+
 <div class="container">
 
     <!-- Header -->
-    <h1>Exam Calendar</h1>
+    <h1>📅 Exam Calendar</h1>
     <p class="subtitle">
-        Track all upcoming exams and manage priorities effectively.
+        Track all upcoming exams and manage your study schedule.
     </p>
 
-    <div class="section">
-
+    <div class="calendar-container">
         {% if subjects and subjects|length > 0 %}
 
-        <table class="calendar-table">
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Subject</th>
-                    <th>Exam Date</th>
-                    <th>Priority</th>
-                </tr>
-            </thead>
+        <div class="exams-list">
+            {% for subject in subjects %}
+            {% set exam_date = subject.exam_date %}
+            {% set exam_obj = namespace(days=-999) %}
+            
+            <!-- Calculate days remaining (Python datetime would be ideal, but doing JS fallback) -->
+            <div class="exam-card {{ subject.priority | lower }}">
+                <div class="exam-header">
+                    <div class="exam-title">
+                        <h3>{{ subject.subject_name }}</h3>
+                        <p class="student-name">👤 {{ subject.student_name }} ({{ subject.roll_number }})</p>
+                    </div>
+                    <span class="priority-badge {{ subject.priority }}">{{ subject.priority }}</span>
+                </div>
 
-            <tbody>
-                {% for subject in subjects %}
-                <tr>
-                    <td>{{ subject.student_name }}</td>
-                    <td>{{ subject.subject_name }}</td>
-                    <td>{{ subject.exam_date }}</td>
-                    <td>
-                        {% if subject.priority == "High" %}
-                            <span class="badge high">High</span>
-                        {% elif subject.priority == "Medium" %}
-                            <span class="badge medium">Medium</span>
-                        {% else %}
-                            <span class="badge low">Low</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                <div class="exam-details">
+                    <div class="detail-box">
+                        <div class="detail-label">📅 Exam Date</div>
+                        <div class="detail-value">{{ exam_date }}</div>
+                    </div>
+                    
+                    <div class="detail-box">
+                        <div class="detail-label">⏱️ Days Remaining</div>
+                        <div class="detail-value" id="days-{{ loop.index }}">
+                            <span class="days-remaining normal" style="display:inline-block;">Calculating...</span>
+                        </div>
+                    </div>
+
+                    <div class="detail-box">
+                        <div class="detail-label">🎯 Priority</div>
+                        <div class="detail-value">{{ subject.priority }}</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="section">
+            <h3>📊 Calendar Table View</h3>
+            <div class="table-view">
+                <table class="calendar-table">
+                    <thead>
+                        <tr>
+                            <th>Student Name</th>
+                            <th>Subject</th>
+                            <th>Exam Date</th>
+                            <th>Days Left</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for subject in subjects %}
+                        <tr>
+                            <td>{{ subject.student_name }}</td>
+                            <td>{{ subject.subject_name }}</td>
+                            <td><strong>{{ subject.exam_date }}</strong></td>
+                            <td id="table-days-{{ loop.index }}"><em>Calculating...</em></td>
+                            <td>
+                                {% if subject.priority == "High" %}
+                                    <span class="badge high">🔴 High</span>
+                                {% elif subject.priority == "Medium" %}
+                                    <span class="badge medium">🟡 Medium</span>
+                                {% else %}
+                                    <span class="badge low">🟢 Low</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         {% else %}
 
-        <p style="text-align:center; margin-top:20px;">
-            No subjects added yet. Please add a subject to see it here.
-        </p>
+        <div class="no-exams">
+            <p style="font-size: 1.2rem; margin-bottom: 1rem;">📚 No subjects added yet</p>
+            <p>Add a subject and upload your syllabus to see your exam schedule here.</p>
+        </div>
 
         {% endif %}
-
     </div>
 
     <!-- Navigation Buttons -->
     <div class="button-group">
-        <a href="/" class="btn-secondary">Add New Subject</a>
-        <a href="javascript:history.back()" class="btn-secondary">Back</a>
+        <a href="/" class="btn-secondary">➕ Add New Subject</a>
+        <a href="javascript:history.back()" class="btn-secondary">↩️ Back</a>
     </div>
 
 </div>
+
+<!-- Script to calculate and display days remaining -->
+<script>
+    function calculateDaysRemaining(examDate) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const exam = new Date(examDate);
+        exam.setHours(0, 0, 0, 0);
+        
+        const timeDiff = exam - today;
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        return daysRemaining;
+    }
+
+    function getStatusClass(days) {
+        if (days < 7) return 'urgent';
+        if (days < 14) return 'normal';
+        return 'plenty';
+    }
+
+    function getStatusText(days) {
+        if (days < 0) return '⚠️ Exam passed';
+        if (days === 0) return '🔴 Exam Today!';
+        if (days === 1) return '🔴 Exam Tomorrow!';
+        if (days < 7) return `🔴 ${days} days left`;
+        if (days < 14) return `🟡 ${days} days left`;
+        return `🟢 ${days} days left`;
+    }
+
+    // Get all exam cards and update them
+    const examCards = document.querySelectorAll('[id^="days-"]');
+    examCards.forEach(card => {
+        const index = card.id.split('-')[1];
+        const examDateInput = document.querySelector(`table.calendar-table tbody tr:nth-child(${index}) td:nth-child(3)`);
+        
+        if (examDateInput) {
+            const examDate = examDateInput.textContent.trim();
+            const days = calculateDaysRemaining(examDate);
+            const statusClass = getStatusClass(days);
+            const statusText = getStatusText(days);
+            
+            card.innerHTML = `<span class="days-remaining ${statusClass}">${statusText}</span>`;
+            
+            // Also update table view
+            const tableCell = document.getElementById(`table-days-${index}`);
+            if (tableCell) {
+                tableCell.innerHTML = `<strong>${statusText}</strong>`;
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

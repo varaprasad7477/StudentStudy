@@ -2,79 +2,239 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>StudentStudy - Smart Study Planning</title>
+    <title>AI Study Planner - Smart Study Planning Made Easy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .landing-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            margin: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .landing-content {
+            padding: 4rem 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .landing-visual {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .landing-visual .icon {
+            font-size: 5rem;
+            margin-bottom: 1rem;
+        }
+
+        .landing-visual h2 {
+            font-size: 1.8rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .landing-visual p {
+            margin: 0;
+            color: rgba(255,255,255,0.9);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .landing-content h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .landing-content .subtitle {
+            color: #999;
+            font-size: 1rem;
+            margin: 0 0 2rem 0;
+            line-height: 1.6;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .feature-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text h3 {
+            margin: 0 0 0.3rem 0;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .feature-text p {
+            margin: 0;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: #f0f0f0;
+            color: #333;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .landing-container {
+                grid-template-columns: 1fr;
+            }
+
+            .landing-visual {
+                order: -1;
+                padding: 2rem;
+            }
+
+            .landing-content {
+                padding: 2rem;
+            }
+
+            .landing-content h1 {
+                font-size: 2rem;
+            }
+
+            .landing-visual .icon {
+                font-size: 4rem;
+            }
+
+            .auth-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
-
-    <!-- Header -->
-    <h1>StudentStudy</h1>
-    <p class="subtitle">
-        Upload your syllabus PDF and let AI create a smart study plan based on your exam date.
-    </p>
-
-    <form action="/upload" method="POST" enctype="multipart/form-data">
-
-        <!-- ================= STUDENT DETAILS ================= -->
-        <div class="section">
-            <h2>Student Details</h2>
-
-            <label for="student_name">Student Name</label>
-            <input type="text" id="student_name" name="student_name"
-                   placeholder="Enter your full name" required>
-
-            <label for="roll_number">Roll Number</label>
-            <input type="text" id="roll_number" name="roll_number"
-                   placeholder="Enter your roll number" required>
-        </div>
-
-        <!-- ================= SUBJECT DETAILS ================= -->
-        <div class="section">
-            <h2>Subject Details</h2>
-
-            <label for="subject_name">Subject Name</label>
-            <input type="text" id="subject_name" name="subject_name"
-                   placeholder="Example: Data Structures" required>
-
-            <label for="exam_date">Exam Date</label>
-            <input type="date" id="exam_date" name="exam_date" required>
-
-            <label for="priority">Priority Level</label>
-            <select id="priority" name="priority" required>
-                <option value="High">High Priority</option>
-                <option value="Medium">Medium Priority</option>
-                <option value="Low">Low Priority</option>
-            </select>
-        </div>
-
-        <!-- ================= PDF UPLOAD ================= -->
-        <div class="section">
-            <h2>Syllabus Upload</h2>
-
-            <label for="pdf_file">Upload Syllabus PDF</label>
-            <input type="file" id="pdf_file" name="pdf_file"
-                   accept=".pdf" required>
-        </div>
-
-        <!-- ================= SUBMIT BUTTON ================= -->
-        <button type="submit">Generate AI Study Plan</button>
-
-    </form>
-
-    <!-- Footer Links -->
-    <div class="footer-links">
-        <a href="/calendar">View Exam Calendar</a>
+<div class="landing-container">
+    <!-- Visual Side -->
+    <div class="landing-visual">
+        <div class="icon">📚✨</div>
+        <h2>Study Smarter</h2>
+        <p>Upload your syllabus PDF and get an AI-powered personalized study plan tailored to your exam schedule.</p>
     </div>
 
+    <!-- Content Side -->
+    <div class="landing-content">
+        <h1>AI Study Planner</h1>
+        <p class="subtitle">Transform your syllabus into an organized, weekly study schedule. Perfect for all subjects and exam types.</p>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📄</div>
+                <div class="feature-text">
+                    <h3>Smart PDF Parsing</h3>
+                    <p>Automatically extract chapters and topics from your syllabus</p>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">📅</div>
+                <div class="feature-text">
+                    <h3>Personalized Schedule</h3>
+                    <p>Get a weekly study plan based on your exam date</p>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-text">
+                    <h3>Priority Management</h3>
+                    <p>Focus on high-priority subjects with intelligent scheduling</p>
+                </div>
+            </div>
+
+            <div class="feature">
+                <div class="feature-icon">📊</div>
+                <div class="feature-text">
+                    <h3>Exam Calendar</h3>
+                    <p>Track all your exams in one organized calendar view</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-buttons">
+            <a href="{{ url_for('login') }}" class="btn-secondary">Login</a>
+            <a href="{{ url_for('register') }}" class="btn-primary">Get Started</a>
+        </div>
+    </div>
 </div>
 
 </body>

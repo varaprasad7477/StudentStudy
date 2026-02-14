@@ -10,9 +10,10 @@
 
 body {
     font-family: "Inter", sans-serif;
-    background-color: #0f0f0f;
-    color: #ffffff;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    color: #333;
     line-height: 1.6;
+    min-height: 100vh;
 }
 
 /* ========================= */
@@ -20,13 +21,13 @@ body {
 /* ========================= */
 
 .container {
-    width: 45%;
-    margin: 60px auto;
+    width: 85%;
+    max-width: 1200px;
+    margin: 40px auto;
     padding: 40px;
-    background: #1a1a1a;
+    background: white;
     border-radius: 15px;
-    border: 1px solid #2a2a2a;
-    box-shadow: 0 0 25px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
 }
 
 /* ========================= */
@@ -35,20 +36,22 @@ body {
 
 h1 {
     text-align: center;
-    color: #a855f7;
+    color: #667eea;
     margin-bottom: 10px;
+    font-size: 2.2rem;
 }
 
 h2 {
     margin-bottom: 15px;
-    color: #c084fc;
+    color: #333;
+    font-size: 1.6rem;
 }
 
 .subtitle {
     text-align: center;
-    color: #aaaaaa;
+    color: #666;
     margin-bottom: 30px;
-    font-size: 14px;
+    font-size: 1rem;
 }
 
 /* ========================= */
@@ -58,9 +61,9 @@ h2 {
 .section {
     margin-bottom: 30px;
     padding: 20px;
-    background: #121212;
+    background: #f9f9f9;
     border-radius: 10px;
-    border: 1px solid #2f2f2f;
+    border: 1px solid #e0e0e0;
 }
 
 /* ========================= */
@@ -71,7 +74,8 @@ label {
     display: block;
     margin-bottom: 6px;
     font-size: 14px;
-    color: #cccccc;
+    color: #333;
+    font-weight: 500;
 }
 
 input,
@@ -80,17 +84,18 @@ select {
     padding: 12px;
     margin-bottom: 15px;
     border-radius: 8px;
-    border: 1px solid #333;
-    background: #0f0f0f;
-    color: #ffffff;
+    border: 1px solid #ddd;
+    background: white;
+    color: #333;
     font-size: 14px;
+    transition: border-color 0.3s ease;
 }
 
 input:focus,
 select:focus {
     outline: none;
-    border-color: #7c3aed;
-    box-shadow: 0 0 5px rgba(124, 58, 237, 0.5);
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
 }
 
 /* ========================= */
@@ -100,7 +105,7 @@ select:focus {
 button {
     width: 100%;
     padding: 14px;
-    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
     border-radius: 10px;
     color: white;
@@ -112,7 +117,7 @@ button {
 
 button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(124, 58, 237, 0.4);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
 /* Secondary Buttons */
@@ -120,16 +125,19 @@ button:hover {
 .btn-secondary {
     text-decoration: none;
     padding: 10px 18px;
-    background: #1f1f1f;
-    border: 1px solid #333;
+    background: white;
+    border: 2px solid #667eea;
     border-radius: 8px;
-    color: white;
+    color: #667eea;
     transition: 0.3s ease;
     font-size: 14px;
+    font-weight: 600;
+    display: inline-block;
 }
 
 .btn-secondary:hover {
-    background: #7c3aed;
+    background: #667eea;
+    color: white;
 }
 
 /* Button Group */
@@ -137,7 +145,9 @@ button:hover {
 .button-group {
     display: flex;
     justify-content: space-between;
+    gap: 1rem;
     margin-top: 20px;
+    flex-wrap: wrap;
 }
 
 /* ========================= */
@@ -145,11 +155,20 @@ button:hover {
 /* ========================= */
 
 .student-info {
-    background: #121212;
-    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
     border-radius: 10px;
-    border: 1px solid #2a2a2a;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+.student-info p {
+    margin: 8px 0;
+    font-size: 1rem;
+}
+
+.student-info strong {
+    font-weight: 600;
 }
 
 /* ========================= */
@@ -157,16 +176,16 @@ button:hover {
 /* ========================= */
 
 .plan-box {
-    background: #0f0f0f;
+    background: white;
     padding: 20px;
     border-radius: 10px;
-    border: 1px solid #333;
+    border: 1px solid #e0e0e0;
     white-space: pre-wrap;
     font-size: 14px;
 }
 
 /* ========================= */
-/* PROGRESS BAR */
+/* PROGRESS CONTAINER */
 /* ========================= */
 
 .progress-container {
@@ -176,7 +195,7 @@ button:hover {
 .progress-bar {
     width: 100%;
     height: 12px;
-    background: #222;
+    background: #e0e0e0;
     border-radius: 10px;
     overflow: hidden;
     margin-top: 10px;
@@ -185,7 +204,7 @@ button:hover {
 .progress-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #7c3aed, #a855f7);
+    background: linear-gradient(90deg, #667eea, #764ba2);
     transition: width 0.4s ease;
 }
 
@@ -201,18 +220,19 @@ button:hover {
 
 .calendar-table th,
 .calendar-table td {
-    border: 1px solid #2a2a2a;
+    border: 1px solid #e0e0e0;
     padding: 12px;
     text-align: center;
 }
 
 .calendar-table th {
-    background: #1f1f1f;
-    color: #a855f7;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
 }
 
 .calendar-table tr:hover {
-    background: #181818;
+    background: #f5f5f5;
 }
 
 /* ========================= */
@@ -224,6 +244,7 @@ button:hover {
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
+    color: white;
 }
 
 .badge.high {
@@ -248,7 +269,7 @@ button:hover {
 }
 
 .footer-links a {
-    color: #a855f7;
+    color: #667eea;
     text-decoration: none;
     font-size: 14px;
 }
@@ -263,12 +284,22 @@ button:hover {
 
 @media (max-width: 768px) {
     .container {
-        width: 90%;
+        width: 95%;
         padding: 20px;
+        margin: 20px auto;
+    }
+
+    h1 {
+        font-size: 1.8rem;
     }
 
     .button-group {
         flex-direction: column;
         gap: 10px;
+    }
+
+    .btn-secondary {
+        text-align: center;
+        width: 100%;
     }
 }

@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Subject - AI Study Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <style>
+        .upload-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .upload-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .upload-header h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin: 0 0 0.5rem 0;
+        }
+
+        .upload-header p {
+            color: #999;
+            margin: 0;
+        }
+
+        .breadcrumb {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .breadcrumb a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input[type="file"] {
+            padding: 0.5rem;
+            cursor: pointer;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .field-row .form-group {
+            margin-bottom: 0;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #999;
+            margin-top: 0.3rem;
+        }
+
+        .file-upload-box {
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background: rgba(102, 126, 234, 0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-box:hover {
+            border-color: #764ba2;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .file-upload-box.has-file {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .file-upload-box input[type="file"] {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-text {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .file-name {
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        .priority-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .priority-radio {
+            display: none;
+        }
+
+        .priority-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .priority-radio:checked + .priority-label {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .priority-radio[value="High"]:checked + .priority-label {
+            border-color: #991b1b;
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .priority-radio[value="Medium"]:checked + .priority-label {
+            border-color: #78350f;
+            background: #fcd34d;
+            color: #78350f;
+        }
+
+        .priority-radio[value="Low"]:checked + .priority-label {
+            border-color: #065f46;
+            background: #bbf7d0;
+            color: #065f46;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #e0e0e0;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fecaca;
+            border: 2px solid #991b1b;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .success-message {
+            background: #bbf7d0;
+            border: 2px solid #065f46;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        @media (max-width: 600px) {
+            .upload-container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+
+            .field-row {
+                grid-template-columns: 1fr;
+            }
+
+            .priority-options {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="upload-container">
+    <!-- Header -->
+    <div class="upload-header">
+        <h1>📚 Add New Subject</h1>
+        <p>Upload your syllabus and generate a personalized study plan</p>
+    </div>
+
+    <!-- Breadcrumb -->
+    <div class="breadcrumb">
+        <a href="{{ url_for('dashboard_home') }}">Dashboard</a>
+        <span>/</span>
+        <span>Add Subject</span>
+    </div>
+
+    <!-- Messages -->
+    <div id="errorMessage" class="error-message"></div>
+    <div id="successMessage" class="success-message"></div>
+
+    <!-- Form -->
+    <form id="uploadForm" method="POST" enctype="multipart/form-data">
+        <!-- Student Name -->
+        <div class="form-group">
+            <label for="studentName">📝 Full Name</label>
+            <input 
+                type="text" 
+                id="studentName" 
+                name="student_name" 
+                placeholder="Enter your full name"
+                required
+                minlength="2"
+            >
+            <div class="help-text">This will appear on your study plans</div>
+        </div>
+
+        <!-- Roll Number -->
+        <div class="form-group">
+            <label for="rollNumber">🎓 Roll Number / Student ID</label>
+            <input 
+                type="text" 
+                id="rollNumber" 
+                name="roll_number" 
+                placeholder="e.g., A001"
+                required
+            >
+        </div>
+
+        <!-- Subject Name & Exam Date (Row) -->
+        <div class="field-row">
+            <div class="form-group">
+                <label for="subjectName">📖 Subject Name</label>
+                <input 
+                    type="text" 
+                    id="subjectName" 
+                    name="subject_name" 
+                    placeholder="e.g., Mathematics"
+                    required
+                    minlength="2"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="examDate">📅 Exam Date</label>
+                <input 
+                    type="date" 
+                    id="examDate" 
+                    name="exam_date" 
+                    required
+                >
+                <div class="help-text" id="daysInfo"></div>
+            </div>
+        </div>
+
+        <!-- Priority -->
+        <div class="form-group">
+            <label>🎯 Priority Level</label>
+            <div class="priority-options">
+                <div>
+                    <input 
+                        type="radio" 
+                        id="priorityHigh" 
+                        name="priority" 
+                        value="High"
+                        class="priority-radio"
+                    >
+                    <label for="priorityHigh" class="priority-label">🔴 High</label>
+                </div>
+                <div>
+                    <input 
+                        type="radio" 
+                        id="priorityMedium" 
+                        name="priority" 
+                        value="Medium"
+                        class="priority-radio"
+                        checked
+                    >
+                    <label for="priorityMedium" class="priority-label">🟡 Medium</label>
+                </div>
+                <div>
+                    <input 
+                        type="radio" 
+                        id="priorityLow" 
+                        name="priority" 
+                        value="Low"
+                        class="priority-radio"
+                    >
+                    <label for="priorityLow" class="priority-label">🟢 Low</label>
+                </div>
+            </div>
+            <div class="help-text">This determines study urgency in your plan</div>
+        </div>
+
+        <!-- PDF Upload -->
+        <div class="form-group">
+            <label for="pdfFile">📄 Upload Syllabus (PDF)</label>
+            <div class="file-upload-box" id="uploadBox" onclick="document.getElementById('pdfFile').click()">
+                <div class="upload-icon">📤</div>
+                <div class="upload-text">Click to upload or drag and drop</div>
+                <div class="upload-subtext">PDF format (Max 10MB)</div>
+                <div class="file-name" id="fileName"></div>
+            </div>
+            <input 
+                type="file" 
+                id="pdfFile" 
+                name="pdf_file" 
+                accept=".pdf"
+                required
+            >
+            <div class="help-text">Upload your complete syllabus for intelligent study plan generation</div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="goBack()">← Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Generate Study Plan</button>
+        </div>
+    </form>
+
+    <!-- Loading State -->
+    <div class="loading" id="loadingState">
+        <div class="spinner"></div>
+        <p>Generating your personalized study plan...</p>
+        <p style="color: #999; font-size: 0.9rem;">This may take a minute</p>
+    </div>
+</div>
+
+<script>
+    const uploadBox = document.getElementById('uploadBox');
+    const pdfFile = document.getElementById('pdfFile');
+    const fileName = document.getElementById('fileName');
+    const form = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const examDateInput = document.getElementById('examDate');
+    const loadingState = document.getElementById('loadingState');
+    const errorMessage = document.getElementById('errorMessage');
+    const successMessage = document.getElementById('successMessage');
+
+    // Drag and drop
+    uploadBox.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadBox.style.borderColor = '#764ba2';
+        uploadBox.style.background = 'rgba(102, 126, 234, 0.15)';
+    });
+
+    uploadBox.addEventListener('dragleave', () => {
+        uploadBox.style.borderColor = '#667eea';
+        uploadBox.style.background = 'rgba(102, 126, 234, 0.05)';
+    });
+
+    uploadBox.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadBox.style.borderColor = '#667eea';
+        uploadBox.style.background = 'rgba(102, 126, 234, 0.05)';
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            pdfFile.files = files;
+            updateFileName();
+        }
+    });
+
+    // File input change
+    pdfFile.addEventListener('change', updateFileName);
+
+    function updateFileName() {
+        if (pdfFile.files.length > 0) {
+            const file = pdfFile.files[0];
+            
+            // Validate file size (10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showError('File size exceeds 10MB limit');
+                pdfFile.value = '';
+                fileName.textContent = '';
+                return;
+            }
+            
+            // Validate file type
+            if (file.type !== 'application/pdf') {
+                showError('Please upload a PDF file');
+                pdfFile.value = '';
+                fileName.textContent = '';
+                return;
+            }
+            
+            fileName.textContent = `✅ ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`;
+            uploadBox.classList.add('has-file');
+            hideError();
+        } else {
+            fileName.textContent = '';
+            uploadBox.classList.remove('has-file');
+        }
+    }
+
+    // Update days info
+    examDateInput.addEventListener('change', () => {
+        if (examDateInput.value) {
+            const today = new Date();
+            const examDate = new Date(examDateInput.value);
+            const daysRemaining = Math.ceil((examDate - today) / (1000 * 3600 * 24));
+            
+            let daysText = '';
+            if (daysRemaining < 0) {
+                daysText = '⚠️ Date is in the past';
+            } else if (daysRemaining === 0) {
+                daysText = '🔴 Exam is today!';
+            } else if (daysRemaining === 1) {
+                daysText = '🔴 Exam is tomorrow!';
+            } else {
+                daysText = `📅 ${daysRemaining} days away`;
+            }
+            
+            document.getElementById('daysInfo').textContent = daysText;
+        }
+    });
+
+    // Form submission
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        // Validate
+        if (!form.checkValidity()) {
+            showError('Please fill all required fields');
+            return;
+        }
+        
+        if (!pdfFile.files.length) {
+            showError('Please upload a PDF file');
+            return;
+        }
+        
+        // Show loading
+        loadingState.classList.add('show');
+        submitBtn.disabled = true;
+        
+        try {
+            const formData = new FormData(form);
+            const response = await fetch('{{ url_for("upload") }}', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || 'Upload failed');
+            }
+            
+            // Success - redirect to dashboard
+            showSuccess('Study plan generated successfully!');
+            setTimeout(() => {
+                window.location.href = '{{ url_for("dashboard_home") }}';
+            }, 2000);
+            
+        } catch (error) {
+            showError(error.message);
+            loadingState.classList.remove('show');
+            submitBtn.disabled = false;
+        }
+    });
+
+    function showError(message) {
+        errorMessage.textContent = '❌ ' + message;
+        errorMessage.classList.add('show');
+        successMessage.classList.remove('show');
+    }
+
+    function showSuccess(message) {
+        successMessage.textContent = '✅ ' + message;
+        successMessage.classList.add('show');
+        errorMessage.classList.remove('show');
+    }
+
+    function hideError() {
+        errorMessage.classList.remove('show');
+    }
+
+    function goBack() {
+        window.location.href = '{{ url_for("dashboard_home") }}';
+    }
+
+    // Set minimum exam date to today
+    const today = new Date().toISOString().split('T')[0];
+    examDateInput.min = today;
+</script>
+
+</body>
+</html>
