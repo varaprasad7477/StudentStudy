@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Exam Calendar | StudentStudy</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <h1>Exam Calendar</h1>
+    <p class="subtitle">
+        Track all upcoming exams and manage priorities effectively.
+    </p>
+
+    <div class="section">
+
+        {% if subjects and subjects|length > 0 %}
+
+        <table class="calendar-table">
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Subject</th>
+                    <th>Exam Date</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for subject in subjects %}
+                <tr>
+                    <td>{{ subject.student_name }}</td>
+                    <td>{{ subject.subject_name }}</td>
+                    <td>{{ subject.exam_date }}</td>
+                    <td>
+                        {% if subject.priority == "High" %}
+                            <span class="badge high">High</span>
+                        {% elif subject.priority == "Medium" %}
+                            <span class="badge medium">Medium</span>
+                        {% else %}
+                            <span class="badge low">Low</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+
+        <p style="text-align:center; margin-top:20px;">
+            No subjects added yet. Please add a subject to see it here.
+        </p>
+
+        {% endif %}
+
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="button-group">
+        <a href="/" class="btn-secondary">Add New Subject</a>
+        <a href="javascript:history.back()" class="btn-secondary">Back</a>
+    </div>
+
+</div>
+
+</body>
+</html>

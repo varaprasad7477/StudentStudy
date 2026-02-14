@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>StudentStudy - Smart Study Planning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <h1>StudentStudy</h1>
+    <p class="subtitle">
+        Upload your syllabus PDF and let AI create a smart study plan based on your exam date.
+    </p>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+
+        <!-- ================= STUDENT DETAILS ================= -->
+        <div class="section">
+            <h2>Student Details</h2>
+
+            <label for="student_name">Student Name</label>
+            <input type="text" id="student_name" name="student_name"
+                   placeholder="Enter your full name" required>
+
+            <label for="roll_number">Roll Number</label>
+            <input type="text" id="roll_number" name="roll_number"
+                   placeholder="Enter your roll number" required>
+        </div>
+
+        <!-- ================= SUBJECT DETAILS ================= -->
+        <div class="section">
+            <h2>Subject Details</h2>
+
+            <label for="subject_name">Subject Name</label>
+            <input type="text" id="subject_name" name="subject_name"
+                   placeholder="Example: Data Structures" required>
+
+            <label for="exam_date">Exam Date</label>
+            <input type="date" id="exam_date" name="exam_date" required>
+
+            <label for="priority">Priority Level</label>
+            <select id="priority" name="priority" required>
+                <option value="High">High Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="Low">Low Priority</option>
+            </select>
+        </div>
+
+        <!-- ================= PDF UPLOAD ================= -->
+        <div class="section">
+            <h2>Syllabus Upload</h2>
+
+            <label for="pdf_file">Upload Syllabus PDF</label>
+            <input type="file" id="pdf_file" name="pdf_file"
+                   accept=".pdf" required>
+        </div>
+
+        <!-- ================= SUBMIT BUTTON ================= -->
+        <button type="submit">Generate AI Study Plan</button>
+
+    </form>
+
+    <!-- Footer Links -->
+    <div class="footer-links">
+        <a href="/calendar">View Exam Calendar</a>
+    </div>
+
+</div>
+
+</body>
+</html>
